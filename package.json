@@ -1,0 +1,22 @@
+{
+  "name": "new-pr-welcome",
+  "version": "1.0.0",
+  "description": "welcomes users who submit their first pr",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/behaviorbot/new-pr-welcome.git"
+  },
+  "author": "hiimbex",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/behaviorbot/new-pr-welcome/issues"
+  },
+  "homepage": "https://github.com/behaviorbot/new-pr-welcome#readme",
+  "dependencies": {
+    "github": "^9.2.0"
+  }
+}
