@@ -9,46 +9,31 @@ module.exports = robot => {
     const repo_name = context.payload.repository.name;
 
     const options = context.repo({path: '.github/new-pr-welcome.md'});
-    const response = await context.github.repos.getContent(options);
-    const template = new Buffer(response.data.content, 'base64').toString();
+    const res = await context.github.repos.getContent(options);
+    const template = new Buffer(res.data.content, 'base64').toString();
 
-    var GitHubApi = require("github");
-    
-    var github = new GitHubApi({
-        debug: true,
-    });
-    
-    github.authenticate({
-        type: "oauth",
-        key: process.env.CLIENT_ID,
-        secret: process.env.CLIENT_SECRET
-    });
-    
-    github.issues.getForRepo({
+    const github = await robot.auth(context.payload.installation.id);
+    const response = await github.issues.getForRepo(context.repo({
         owner: repo_owner_id,
         repo: repo_name,
         state: "all",
         creator: user_login
-    }, function(error, response) {
-        if (error) {
-            console.log(error.toJSON());
-        } else {
-            var count_pr = 0
-            //check for issues that are also PRs
-            for (i = 0; i < response.data.length; i++) {
-                if ((response.data[i]).pull_request) {
-                    count_pr += 1;
-                }
-                //exit loop if more than one PR
-                if (count_pr > 1) {
-                    break;
-                }
-            }
-            //check length of response to make sure its only one pr
-            if (count_pr === 1) {
-                context.github.issues.createComment(context.issue({body: template}));
-            }
+    }));
+
+    var count_pr = 0
+    //check for issues that are also PRs
+    for (i = 0; i < response.data.length; i++) {
+        if ((response.data[i]).pull_request) {
+            count_pr += 1;
         }
-    });
+        //exit loop if more than one PR
+        if (count_pr > 1) {
+            break;
+        }
+    }
+    //check length of response to make sure its only one pr
+    if (count_pr === 1) {
+        context.github.issues.createComment(context.issue({body: template}));
+    }
   });
 };
