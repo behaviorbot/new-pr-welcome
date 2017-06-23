@@ -1,5 +1,5 @@
 module.exports = robot => {
-  robot.on('pull_request', async context => {
+  robot.on('pull_request.opened', async context => {
     if (!context.payload.repository.owner || !context.payload.pull_request.user.id || !context.payload.repository.name) {
         issue = (await context.github.pull_request.get(context.issue())).data;
     }
