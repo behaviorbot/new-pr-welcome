@@ -7,10 +7,13 @@ module.exports = robot => {
     const user_login = context.payload.pull_request.user.login;
     const repo_owner_id = context.payload.repository.owner.login;
     const repo_name = context.payload.repository.name;
-
-    const options = context.repo({path: '.github/new-pr-welcome.md'});
-    const res = await context.github.repos.getContent(options);
-    const template = new Buffer(res.data.content, 'base64').toString();
+    
+    async function getWelcomeFile() {
+        const options = context.repo({path: '.github/new-pr-welcome.md'});
+        const res = await context.github.repos.getContent(options);
+        return new Buffer(res.data.content, 'base64').toString();
+    }
+    const template = getWelcomeFile();
 
     const github = await robot.auth(context.payload.installation.id);
     const response = await github.issues.getForRepo(context.repo({
@@ -20,7 +23,7 @@ module.exports = robot => {
         creator: user_login
     }));
 
-    var count_pr = 0
+    var count_pr = 0;
     //check for issues that are also PRs
     for (i = 0; i < response.data.length; i++) {
         if ((response.data[i]).pull_request) {

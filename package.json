@@ -4,7 +4,7 @@
   "description": "welcomes users who submit their first pr",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,11 @@
   },
   "homepage": "https://github.com/behaviorbot/new-pr-welcome#readme",
   "dependencies": {
-    "github": "^9.2.0"
+    "github": "^9.2.0",
+    "probot": "^0.7.2"
+  },
+  "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.4.2"
   }
 }
