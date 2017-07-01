@@ -4,7 +4,8 @@
   "description": "welcomes users who submit their first pr",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "start": "probot run ./index.js",
+    "test": "mocha && xo --extend probot"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,16 @@
   },
   "homepage": "https://github.com/behaviorbot/new-pr-welcome#readme",
   "dependencies": {
-    "github": "^9.2.0",
-    "probot": "^0.7.2"
+    "github": "^9.2.0"
   },
   "devDependencies": {
     "expect": "^1.20.2",
-    "mocha": "^3.4.2"
+    "localtunnel": "^1.8.3",
+    "mocha": "^3.4.2",
+    "probot": "^0.7.4",
+    "xo": "^0.18.2"
+  },
+  "xo": {
+    "space": 4
   }
 }
