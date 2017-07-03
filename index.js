@@ -1,36 +1,41 @@
 module.exports = robot => {
-  robot.on('pull_request.opened', receive);
-  async function receive(context) {
-    const user_login = context.payload.pull_request.user.login;
-    const repo_owner_id = context.payload.repository.owner.login;
-    const repo_name = context.payload.repository.name;
+    robot.on('pull_request.opened', receive);
+    async function receive(context) {
+        const userLogin = context.payload.pull_request.user.login;
+        const repoOwnerLogin = context.payload.repository.owner.login;
+        const repoName = context.payload.repository.name;
 
-    const options = context.repo({path: '.github/new-pr-welcome.md'});
-    const res = await context.github.repos.getContent(options);
-    const template = Buffer.from(res.data.content, 'base64').toString();
+        const github = await robot.auth(context.payload.installation.id);
+        // Get all issues for repo with user as creator
+        const response = await github.issues.getForRepo(context.repo({
+            owner: repoOwnerLogin,
+            repo: repoName,
+            state: 'all',
+            creator: userLogin
+        }));
 
-    const github = await robot.auth(context.payload.installation.id);
-    const response = await github.issues.getForRepo(context.repo({
-        owner: repo_owner_id,
-        repo: repo_name,
-        state: "all",
-        creator: user_login
-    }));
-
-    var count_pr = 0;
-    // Check for issues that are also PRs
-    for (i = 0; i < response.data.length; i++) {
-        if ((response.data[i]).pull_request) {
-            count_pr += 1;
+        function checkPRCount(response) {
+            let countPR = 0;
+            // Check for issues that are pull requests
+            for (let i = 0; i < response.data.length; i++) {
+                if ((response.data[i]).pull_request) countPR += 1;
+                // Return false if more than one PR
+                if (countPR > 1) return false;
+            }
+            return true;
         }
-        // Exit loop if more than one PR
-        if (count_pr > 1) {
-            break;
+
+        if (checkPRCount(response)) {
+            let template;
+            // Get the repo's template for response and post it as a comment
+            try {
+                const options = context.repo({path: '.github/new-pr-welcome.md'});
+                const res = await context.github.repos.getContent(options);
+                template = Buffer.from(res.data.content, 'base64').toString();
+            } catch(err) {
+                template = 'Thanks for opening your first PR here!';
+            }
+            context.github.issues.createComment(context.issue({body: template}));
         }
     }
-
-    // Check length of response to make sure its only one pr
-    if (count_pr === 1) {
-        context.github.issues.createComment(context.issue({body: template}));
-    }
-}};
+};

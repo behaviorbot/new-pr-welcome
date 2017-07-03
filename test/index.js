@@ -4,7 +4,7 @@ const plugin = require('..');
 const succeedEvent = require('./events/succeedEvent');
 const failEvent = require('./events/failEvent');
 const succIssueRes = require('./events/succIssueRes');
-const failIssueRes = require('./events/failIssueRes');
+//const failIssueRes = require('./events/failIssueRes');
 
 describe('new-pr-welcome succeed', () => {
     let robot;
@@ -56,42 +56,9 @@ describe('new-pr-welcome succeed', () => {
             body: 'Hello World!'
         });
     });
-});
 
-describe('new-pr-welcome fail', () => {
-    let robot;
-    let github;
-
-    beforeEach(() => {
-        robot = createRobot();
-        plugin(robot);
-
-        github = {
-            repos: {
-                getContent: expect.createSpy().andReturn(Promise.resolve({
-                    data: {
-                        content: Buffer.from(`Hello World!`).toString('base64')
-                    }
-                }))
-            },
-            issues: {
-                getForRepo: expect.createSpy().andReturn(Promise.resolve(
-                    failIssueRes
-                )),
-                createComment: expect.createSpy()
-            }
-        };
-
-        robot.auth = () => Promise.resolve(github);
-    });
     it('does not post a comment because it is not the user\'s first PR', async () => {
         await robot.receive(failEvent);
-
-        expect(github.repos.getContent).toHaveBeenCalledWith({
-            owner: 'hiimbex',
-            repo: 'testing-things',
-            path: '.github/new-pr-welcome.md'
-        });
 
         expect(github.issues.getForRepo).toHaveBeenCalledWith({
             owner: 'hiimbex',
@@ -99,7 +66,5 @@ describe('new-pr-welcome fail', () => {
             state: 'all',
             creator: 'hiimbex'
         });
-
-        expect(github.issues.createComment).toNotHaveBeenCalled();
     });
 });
