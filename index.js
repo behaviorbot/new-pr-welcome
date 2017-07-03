@@ -16,15 +16,14 @@ module.exports = robot => {
             creator: userLogin
         }));
 
-        let check = new checkCount(response);
-        if (check.PRCount) {
+        if (checkCount.PRCount(response)) {
             let template;
             // Get the repo's template for response and post it as a comment
             try {
                 const options = context.repo({path: '.github/new-pr-welcome.md'});
                 const res = await context.github.repos.getContent(options);
                 template = Buffer.from(res.data.content, 'base64').toString();
-            } catch(err) {
+            } catch (err) {
                 template = 'Thanks for opening your first PR here!';
             }
             context.github.issues.createComment(context.issue({body: template}));
