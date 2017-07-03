@@ -1,3 +1,5 @@
+const checkCount = require('./lib/checkCount');
+
 module.exports = robot => {
     robot.on('pull_request.opened', receive);
     async function receive(context) {
@@ -14,18 +16,8 @@ module.exports = robot => {
             creator: userLogin
         }));
 
-        function checkPRCount(response) {
-            let countPR = 0;
-            // Check for issues that are pull requests
-            for (let i = 0; i < response.data.length; i++) {
-                if ((response.data[i]).pull_request) countPR += 1;
-                // Return false if more than one PR
-                if (countPR > 1) return false;
-            }
-            return true;
-        }
-
-        if (checkPRCount(response)) {
+        let check = new checkCount(response);
+        if (check.PRCount) {
             let template;
             // Get the repo's template for response and post it as a comment
             try {
