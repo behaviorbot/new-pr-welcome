@@ -1,39 +1,33 @@
+const checkCount = require('./lib/checkCount');
+
 module.exports = robot => {
-  robot.on('pull_request.opened', async context => {
-    if (!context.payload.repository.owner || !context.payload.pull_request.user.id || !context.payload.repository.name) {
-        issue = (await context.github.pull_request.get(context.issue())).data;
-    }
+    robot.on('pull_request.opened', receive);
+    async function receive(context) {
+        const userLogin = context.payload.pull_request.user.login;
+        const repoOwnerLogin = context.payload.repository.owner.login;
+        const repoName = context.payload.repository.name;
 
-    const user_login = context.payload.pull_request.user.login;
-    const repo_owner_id = context.payload.repository.owner.login;
-    const repo_name = context.payload.repository.name;
+        const github = await robot.auth(context.payload.installation.id);
+        // Get all issues for repo with user as creator
+        const response = await github.issues.getForRepo(context.repo({
+            owner: repoOwnerLogin,
+            repo: repoName,
+            state: 'all',
+            creator: userLogin
+        }));
 
-    const options = context.repo({path: '.github/new-pr-welcome.md'});
-    const res = await context.github.repos.getContent(options);
-    const template = new Buffer(res.data.content, 'base64').toString();
-
-    const github = await robot.auth(context.payload.installation.id);
-    const response = await github.issues.getForRepo(context.repo({
-        owner: repo_owner_id,
-        repo: repo_name,
-        state: "all",
-        creator: user_login
-    }));
-
-    var count_pr = 0
-    //check for issues that are also PRs
-    for (i = 0; i < response.data.length; i++) {
-        if ((response.data[i]).pull_request) {
-            count_pr += 1;
-        }
-        //exit loop if more than one PR
-        if (count_pr > 1) {
-            break;
+        if (checkCount.PRCount(response)) {
+            let template;
+            // Get the repo's template for response and post it as a comment
+            try {
+                const options = context.repo({path: '.github/new-pr-welcome.md'});
+                const res = await context.github.repos.getContent(options);
+                template = Buffer.from(res.data.content, 'base64').toString();
+            } catch (err) {
+                if (err.code === 404) template = 'Congratulations on merging your first pull request!';
+                else throw err;
+            }
+            context.github.issues.createComment(context.issue({body: template}));
         }
     }
-    //check length of response to make sure its only one pr
-    if (count_pr === 1) {
-        context.github.issues.createComment(context.issue({body: template}));
-    }
-  });
 };
