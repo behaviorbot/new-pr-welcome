@@ -24,7 +24,8 @@ module.exports = robot => {
                 const res = await context.github.repos.getContent(options);
                 template = Buffer.from(res.data.content, 'base64').toString();
             } catch (err) {
-                template = 'Thanks for opening your first PR here!';
+                if (err.code === 404) template = 'Congratulations on merging your first pull request!';
+                else throw err;
             }
             context.github.issues.createComment(context.issue({body: template}));
         }
