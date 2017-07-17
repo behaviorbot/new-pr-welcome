@@ -1,3 +1,4 @@
+const yaml = require('js-yaml');
 const checkCount = require('./lib/checkCount');
 
 module.exports = robot => {
@@ -17,17 +18,16 @@ module.exports = robot => {
         }));
 
         if (checkCount.PRCount(response)) {
-            let template;
+            let config;
             // Get the repo's template for response and post it as a comment
             try {
-                const options = context.repo({path: '.github/new-pr-welcome.md'});
+                const options = context.repo({path: '.github/config.yml'});
                 const res = await context.github.repos.getContent(options);
-                template = Buffer.from(res.data.content, 'base64').toString();
+                config = yaml.load(Buffer.from(res.data.content, 'base64').toString()) || {};
             } catch (err) {
-                if (err.code === 404) template = 'Congratulations on merging your first pull request!';
-                else throw err;
+                if (err.code !== 404) throw err;
             }
-            context.github.issues.createComment(context.issue({body: template}));
+            context.github.issues.createComment(context.issue({body: config.newPRWelcomeComment}));
         }
     }
 };
