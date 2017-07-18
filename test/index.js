@@ -20,7 +20,7 @@ describe('new-pr-welcome', () => {
             repos: {
                 getContent: expect.createSpy().andReturn(Promise.resolve({
                     data: {
-                        content: Buffer.from(`Hello World!`).toString('base64')
+                        content: Buffer.from(`newPRWelcomeComment: >\n  Hello World!`).toString('base64')
                     }
                 }))
             },
@@ -53,15 +53,10 @@ describe('new-pr-welcome', () => {
             expect(github.repos.getContent).toHaveBeenCalledWith({
                 owner: 'hiimbex',
                 repo: 'testing-things',
-                path: '.github/new-pr-welcome.md'
+                path: '.github/config.yml'
             });
 
-            expect(github.issues.createComment).toHaveBeenCalledWith({
-                owner: 'hiimbex',
-                repo: 'testing-things',
-                number: 5,
-                body: 'Hello World!'
-            });
+            expect(github.issues.createComment).toHaveBeenCalled();
         });
     });
     
