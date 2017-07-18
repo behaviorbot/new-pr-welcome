@@ -15,7 +15,7 @@
 
 # Comment to be posted to on PRs from first time contributors in your repository
 newPRWelcomeComment: >
-  Thanks for opening this pull request! Pleas check out our contributing guidelines here: example.md
+  Thanks for opening this pull request! Please check out our contributing guidelines here: example.md
 ```
 
 ## Setup
