@@ -1,5 +1,4 @@
 const yaml = require('js-yaml');
-const checkCount = require('./lib/checkCount');
 
 module.exports = robot => {
     robot.on('pull_request.opened', receive);
@@ -17,7 +16,8 @@ module.exports = robot => {
             creator: userLogin
         }));
 
-        if (checkCount.PRCount(response)) {
+        const countPR = response.data.filter(data => data.pull_request);
+        if (countPR.length === 1) {
             let config;
             // Get the repo's template for response and post it as a comment
             try {
@@ -25,7 +25,9 @@ module.exports = robot => {
                 const res = await context.github.repos.getContent(options);
                 config = yaml.safeLoad(Buffer.from(res.data.content, 'base64').toString()) || {};
             } catch (err) {
-                if (err.code !== 404) throw err;
+                if (err.code !== 404) {
+                    throw err;
+                }
             }
             context.github.issues.createComment(context.issue({body: config.newPRWelcomeComment}));
         }
