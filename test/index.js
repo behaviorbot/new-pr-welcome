@@ -1,7 +1,6 @@
 const expect = require('expect');
 const {createRobot} = require('probot');
 const plugin = require('..');
-const checkCount = require('../lib/checkCount');
 const succeedEvent = require('./events/succeedEvent');
 const failEvent = require('./events/failEvent');
 const succIssueRes = require('./events/succIssueRes');
@@ -10,7 +9,6 @@ const failIssueRes = require('./events/failIssueRes');
 describe('new-pr-welcome', () => {
     let robot;
     let github;
-    let check;
 
     beforeEach(() => {
         robot = createRobot();
@@ -32,8 +30,6 @@ describe('new-pr-welcome', () => {
             }
         };
 
-        check = checkCount.PRCount(succIssueRes);
-
         robot.auth = () => Promise.resolve(github);
     });
 
@@ -48,8 +44,6 @@ describe('new-pr-welcome', () => {
                 creator: 'hiimbex-testing'
             });
 
-            expect(check).toBe(true);
-
             expect(github.repos.getContent).toHaveBeenCalledWith({
                 owner: 'hiimbex',
                 repo: 'testing-things',
@@ -59,11 +53,10 @@ describe('new-pr-welcome', () => {
             expect(github.issues.createComment).toHaveBeenCalled();
         });
     });
-    
+
     describe('new-pr-welcome fail', () => {
         beforeEach(() => {
             github.issues.getForRepo = expect.createSpy().andReturn(Promise.resolve(failIssueRes));
-            check = checkCount.PRCount(failIssueRes);
         });
 
         it('does not post a comment because it is not the user\'s first PR', async () => {
@@ -76,10 +69,7 @@ describe('new-pr-welcome', () => {
                 creator: 'hiimbex'
             });
 
-            expect(check).toBe(false);
-
             expect(github.repos.getContent).toNotHaveBeenCalled();
-
             expect(github.issues.createComment).toNotHaveBeenCalled();
         });
     });
