@@ -19,15 +19,19 @@
   "homepage": "https://github.com/behaviorbot/new-pr-welcome#readme",
   "dependencies": {
     "github": "^9.2.0",
-    "js-yaml": "^3.9.0"
+    "js-yaml": "^3.9.0",
+    "probot": "^0.8.0"
   },
   "devDependencies": {
     "eslint-config-probot": "^0.1.0",
     "expect": "^1.20.2",
     "localtunnel": "^1.8.3",
     "mocha": "^3.4.2",
-    "probot": "^0.7.5",
     "xo": "^0.18.2"
+  },
+  "engines": {
+    "node": ">= 7.7.0",
+    "npm": ">= 4.0.0"
   },
   "xo": {
     "space": 4
