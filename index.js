@@ -11,7 +11,7 @@ module.exports = robot => {
         if (countPR.length === 1) {
             try {
                 const config = await context.config('config.yml');
-                if (config.newPRWelcomeComment){
+                if (config.newPRWelcomeComment) {
                     context.github.issues.createComment(context.issue({body: config.newPRWelcomeComment}));
                 }
             } catch (err) {
