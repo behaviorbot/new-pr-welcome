@@ -1,7 +1,7 @@
-module.exports = robot => {
-    robot.on('pull_request.opened', receive);
+module.exports = app => {
+    app.on('pull_request.opened', receive);
     async function receive(context) {
-        // Get all issues for repo with user as creator
+    // Get all issues for repo with user as creator
         const response = await context.github.issues.getForRepo(context.repo({
             state: 'all',
             creator: context.payload.pull_request.user.login
@@ -14,9 +14,9 @@ module.exports = robot => {
                 if (config.newPRWelcomeComment) {
                     context.github.issues.createComment(context.issue({body: config.newPRWelcomeComment}));
                 }
-            } catch (err) {
-                if (err.code !== 404) {
-                    throw err;
+            } catch (error) {
+                if (error.code !== 404) {
+                    throw error;
                 }
             }
         }
