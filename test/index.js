@@ -1,5 +1,5 @@
 const expect = require('expect');
-const {createRobot} = require('probot');
+const {Application} = require('probot');
 const plugin = require('..');
 const succeedEvent = require('./events/succeedEvent');
 const failEvent = require('./events/failEvent');
@@ -7,12 +7,12 @@ const succIssueRes = require('./events/succIssueRes');
 const failIssueRes = require('./events/failIssueRes');
 
 describe('new-pr-welcome', () => {
-    let robot;
+    let app;
     let github;
 
     beforeEach(() => {
-        robot = createRobot();
-        plugin(robot);
+        app = new Application();
+        plugin(app);
 
         github = {
             repos: {
@@ -30,12 +30,12 @@ describe('new-pr-welcome', () => {
             }
         };
 
-        robot.auth = () => Promise.resolve(github);
+        app.auth = () => Promise.resolve(github);
     });
 
     describe('new-pr-welcome', () => {
         it('posts a comment because it is a user\'s first PR', async () => {
-            await robot.receive(succeedEvent);
+            await app.receive(succeedEvent);
 
             expect(github.issues.getForRepo).toHaveBeenCalledWith({
                 owner: 'hiimbex',
@@ -60,7 +60,7 @@ describe('new-pr-welcome', () => {
         });
 
         it('does not post a comment because it is not the user\'s first PR', async () => {
-            await robot.receive(failEvent);
+            await app.receive(failEvent);
 
             expect(github.issues.getForRepo).toHaveBeenCalledWith({
                 owner: 'hiimbex',
