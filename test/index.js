@@ -1,10 +1,10 @@
 const expect = require('expect');
 const {Application} = require('probot');
-const plugin = require('..');
 const succeedEvent = require('./events/succeedEvent');
 const failEvent = require('./events/failEvent');
 const succIssueRes = require('./events/succIssueRes');
 const failIssueRes = require('./events/failIssueRes');
+const plugin = require('..');
 
 describe('new-pr-welcome', () => {
     let app;
@@ -16,7 +16,7 @@ describe('new-pr-welcome', () => {
 
         github = {
             repos: {
-                getContent: expect.createSpy().andReturn(Promise.resolve({
+                getContents: expect.createSpy().andReturn(Promise.resolve({
                     data: {
                         content: Buffer.from(`newPRWelcomeComment: >\n  Hello World!`).toString('base64')
                     }
@@ -44,7 +44,7 @@ describe('new-pr-welcome', () => {
                 creator: 'hiimbex-testing'
             });
 
-            expect(github.repos.getContent).toHaveBeenCalledWith({
+            expect(github.repos.getContents).toHaveBeenCalledWith({
                 owner: 'hiimbex',
                 repo: 'testing-things',
                 path: '.github/config.yml'
@@ -69,7 +69,7 @@ describe('new-pr-welcome', () => {
                 creator: 'hiimbex'
             });
 
-            expect(github.repos.getContent).toNotHaveBeenCalled();
+            expect(github.repos.getContents).toNotHaveBeenCalled();
             expect(github.issues.createComment).toNotHaveBeenCalled();
         });
     });
