@@ -2,7 +2,7 @@ module.exports = app => {
     app.on('pull_request.opened', receive);
     async function receive(context) {
     // Get all issues for repo with user as creator
-        const response = await context.github.issues.getForRepo(context.repo({
+        const response = await context.github.issues.listForRepo(context.repo({
             state: 'all',
             creator: context.payload.pull_request.user.login
         }));
