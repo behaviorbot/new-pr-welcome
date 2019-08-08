@@ -30,8 +30,17 @@ describe('new-pr-welcome', () => {
 
             await app.receive(succeedEvent);
 
-            expect(github.issues.listForRepo).toHaveBeenCalled();
-            expect(github.repos.getContents).toHaveBeenCalled();
+            expect(github.issues.listForRepo).toHaveBeenCalledWith({
+                owner: 'hiimbex',
+                repo: 'testing-things',
+                state: 'all',
+                creator: 'hiimbex-testing'
+            });
+            expect(github.repos.getContents).toHaveBeenCalledWith({
+                owner: 'hiimbex',
+                repo: 'testing-things',
+                path: '.github/config.yml'
+            });
             expect(github.issues.createComment).toHaveBeenCalled();
         });
     });
@@ -44,7 +53,12 @@ describe('new-pr-welcome', () => {
 
             await app.receive(failEvent);
 
-            expect(github.issues.listForRepo).toHaveBeenCalled();
+            expect(github.issues.listForRepo).toHaveBeenCalledWith({
+                owner: 'hiimbex',
+                repo: 'testing-things',
+                state: 'all',
+                creator: 'hiimbex'
+            });
             expect(github.repos.getContents).toNotHaveBeenCalled();
             expect(github.issues.createComment).toNotHaveBeenCalled();
         });
