@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/behaviorbot/new-pr-welcome#readme",
   "dependencies": {
-    "probot": "9.3.0"
+    "probot": "12.2.8"
   },
   "devDependencies": {
     "eslint-config-probot": "^0.1.0",
